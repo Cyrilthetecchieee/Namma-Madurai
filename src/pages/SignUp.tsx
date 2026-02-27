@@ -10,12 +10,26 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { signup, loginWithGoogle, isLoading } = useAuth();
+  const { signup, loginWithGoogle, selectRole, isLoading } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+
+  // Get the pre-selected role from sessionStorage
+  const pendingRole = sessionStorage.getItem("pending_role") as "citizen" | "admin" | null;
+
+  const navigateAfterAuth = () => {
+    if (pendingRole) {
+      selectRole(pendingRole);
+      sessionStorage.removeItem("pending_role");
+      navigate(pendingRole === "admin" ? "/admin" : "/user");
+    } else {
+      // Fallback if no role was selected (direct access to /signup)
+      navigate("/select-role?mode=signup");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +52,7 @@ const SignUp = () => {
     
     try {
       await signup(name, email, password);
-      navigate("/select-role");
+      navigateAfterAuth();
     } catch {
       setError("Registration failed. Please try again.");
     }
@@ -47,7 +61,7 @@ const SignUp = () => {
   const handleGoogleSignUp = async () => {
     try {
       await loginWithGoogle();
-      navigate("/select-role");
+      navigateAfterAuth();
     } catch {
       setError("Google sign-up failed. Please try again.");
     }
@@ -157,7 +171,7 @@ const SignUp = () => {
 
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link to="/signin" className="font-medium text-primary hover:underline">
+            <Link to="/select-role?mode=signin" className="font-medium text-primary hover:underline">
               Sign in
             </Link>
           </p>

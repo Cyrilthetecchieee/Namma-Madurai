@@ -1,43 +1,39 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { MapPin, User, Shield, ArrowRight } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
 
 const SelectRole = () => {
   const navigate = useNavigate();
-  const { user, selectRole, isAuthenticated } = useAuth();
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/signin");
-    } else if (user?.role) {
-      // Already has role, redirect to appropriate dashboard
-      navigate(user.role === "admin" ? "/admin" : "/user");
-    }
-  }, [isAuthenticated, user, navigate]);
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get("mode") || "signin"; // signin or signup
 
   const handleRoleSelect = (role: "citizen" | "admin") => {
-    selectRole(role);
-    navigate(role === "admin" ? "/admin" : "/user");
+    // Store the selected role in sessionStorage for use after authentication
+    sessionStorage.setItem("pending_role", role);
+    
+    // Navigate to sign in or sign up based on mode
+    if (mode === "signup") {
+      navigate("/signup");
+    } else {
+      navigate("/signin");
+    }
   };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
       {/* Logo */}
-      <div className="mb-8 flex items-center gap-2">
+      <Link to="/" className="mb-8 flex items-center gap-2">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
           <MapPin className="h-5 w-5 text-primary-foreground" />
         </div>
         <span className="text-xl font-bold text-foreground">Namma Madurai</span>
-      </div>
+      </Link>
 
       <Card className="w-full max-w-lg">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Select Your Role</CardTitle>
+          <CardTitle className="text-2xl">How will you use the platform?</CardTitle>
           <CardDescription>
-            Choose how you'll use the platform. This can be changed later in settings.
+            Select your role to continue to {mode === "signup" ? "create your account" : "sign in"}.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -84,7 +80,21 @@ const SelectRole = () => {
       </Card>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        Welcome, <span className="font-medium">{user?.name || "User"}</span>!
+        {mode === "signup" ? (
+          <>
+            Already have an account?{" "}
+            <Link to="/select-role?mode=signin" className="font-medium text-primary hover:underline">
+              Sign in
+            </Link>
+          </>
+        ) : (
+          <>
+            Don't have an account?{" "}
+            <Link to="/select-role?mode=signup" className="font-medium text-primary hover:underline">
+              Create one
+            </Link>
+          </>
+        )}
       </p>
     </div>
   );

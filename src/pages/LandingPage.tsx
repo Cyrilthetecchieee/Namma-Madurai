@@ -18,12 +18,12 @@ const LandingPage = () => {
 
           {/* Right: Auth buttons */}
           <div className="flex items-center gap-2">
-            <Link to="/signin">
+            <Link to="/select-role?mode=signin">
               <Button variant="ghost" size="sm">
                 Sign In
               </Button>
             </Link>
-            <Link to="/signup">
+            <Link to="/select-role?mode=signup">
               <Button size="sm">Sign Up</Button>
             </Link>
           </div>
@@ -59,12 +59,12 @@ const LandingPage = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link to="/signin">
+            <Link to="/select-role?mode=signin">
               <Button size="lg" className="gap-2 text-base">
                 Sign In
               </Button>
             </Link>
-            <Link to="/signup">
+            <Link to="/select-role?mode=signup">
               <Button variant="outline" size="lg" className="gap-2 text-base">
                 Create Account
               </Button>
